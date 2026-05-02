@@ -3,7 +3,10 @@ import axios from "axios";
 import RecordForm from "./components/RecordForm";
 import RecordTable from "./components/RecordTable";
 import WhatsAppModal from "./components/WhatsAppModal";
+import EditModal from "./components/EditModal";
 import Stats from "./components/Stats";
+import ToastContainer from "./components/Toast";
+import useToast from "./hooks/useToast";
 
 const API = "/api/records";
 
@@ -15,6 +18,8 @@ export default function App() {
   const [filterStatus, setFilterStatus] = useState("Todos");
   const [search, setSearch] = useState("");
   const [whatsappRecord, setWhatsappRecord] = useState(null);
+  const [editingRecord, setEditingRecord] = useState(null);
+  const { toasts, addToast, removeToast } = useToast();
 
   const fetchRecords = useCallback(async () => {
     try {
@@ -36,27 +41,36 @@ export default function App() {
     const { data } = await axios.post(API, formData);
     setRecords((prev) => [...prev, data].sort((a, b) => a.next_date.localeCompare(b.next_date)));
     setShowForm(false);
+    addToast("Registro guardado correctamente");
+  };
+
+  const handleEdit = async (id, formData) => {
+    const { data } = await axios.patch(`${API}/${id}`, formData);
+    setRecords((prev) =>
+      prev.map((r) => (r.id === id ? data : r)).sort((a, b) => a.next_date.localeCompare(b.next_date))
+    );
+    setEditingRecord(null);
+    addToast("Registro actualizado correctamente");
   };
 
   const handleAdminister = async (id) => {
     const { data } = await axios.put(`${API}/${id}`);
     setRecords((prev) => prev.map((r) => (r.id === id ? data : r)));
+    addToast("Marcado como administrado hoy");
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm("¿Eliminar este registro?")) return;
     await axios.delete(`${API}/${id}`);
     setRecords((prev) => prev.filter((r) => r.id !== id));
+    addToast("Registro eliminado", "info");
   };
 
-  // Filtros combinados: por estado y por búsqueda de texto
   const filtered = records.filter((r) => {
     const matchStatus = filterStatus === "Todos" || r.status === filterStatus;
     const q = search.toLowerCase();
     const matchSearch =
-      !q ||
-      r.client_name.toLowerCase().includes(q) ||
-      r.pet_name.toLowerCase().includes(q);
+      !q || r.client_name.toLowerCase().includes(q) || r.pet_name.toLowerCase().includes(q);
     return matchStatus && matchSearch;
   });
 
@@ -69,7 +83,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-emerald-600 text-white shadow-md">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -89,14 +102,12 @@ export default function App() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
-        {/* Error de conexión */}
         {error && (
           <div className="bg-red-50 border border-red-300 text-red-700 rounded-lg px-4 py-3 text-sm">
             ⚠️ {error}
           </div>
         )}
 
-        {/* Formulario de alta */}
         {showForm && (
           <div className="bg-white rounded-xl shadow p-6">
             <h2 className="text-lg font-semibold mb-4 text-gray-700">Nuevo registro</h2>
@@ -104,10 +115,8 @@ export default function App() {
           </div>
         )}
 
-        {/* Tarjetas de estadísticas */}
         <Stats counts={statusCounts} active={filterStatus} onFilter={setFilterStatus} />
 
-        {/* Barra de búsqueda */}
         <div className="flex gap-3">
           <input
             type="text"
@@ -117,16 +126,12 @@ export default function App() {
             className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
           />
           {search && (
-            <button
-              onClick={() => setSearch("")}
-              className="text-gray-400 hover:text-gray-600 px-2"
-            >
+            <button onClick={() => setSearch("")} className="text-gray-400 hover:text-gray-600 px-2">
               ✕
             </button>
           )}
         </div>
 
-        {/* Tabla de registros */}
         {loading ? (
           <div className="text-center py-12 text-gray-400">Cargando...</div>
         ) : filtered.length === 0 ? (
@@ -141,14 +146,24 @@ export default function App() {
             onAdminister={handleAdminister}
             onDelete={handleDelete}
             onWhatsApp={setWhatsappRecord}
+            onEdit={setEditingRecord}
           />
         )}
       </main>
 
-      {/* Modal de WhatsApp */}
       {whatsappRecord && (
         <WhatsAppModal record={whatsappRecord} onClose={() => setWhatsappRecord(null)} />
       )}
+
+      {editingRecord && (
+        <EditModal
+          record={editingRecord}
+          onSave={(formData) => handleEdit(editingRecord.id, formData)}
+          onClose={() => setEditingRecord(null)}
+        />
+      )}
+
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   );
 }

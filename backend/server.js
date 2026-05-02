@@ -71,6 +71,29 @@ app.put("/api/records/:id", async (req, res) => {
   }
 });
 
+// PATCH /api/records/:id — editar todos los campos de un registro
+app.patch("/api/records/:id", async (req, res) => {
+  const { client_name, phone, pet_name, pet_type, antiparasitic, last_date, frequency } = req.body;
+
+  if (!client_name || !phone || !pet_name || !pet_type || !antiparasitic || !last_date || !frequency) {
+    return res.status(400).json({ error: "Todos los campos son obligatorios." });
+  }
+
+  const next_date = dayjs(last_date).add(Number(frequency), "day").format("YYYY-MM-DD");
+
+  try {
+    const { rows } = await pool.query(
+      `UPDATE records SET client_name=$1, phone=$2, pet_name=$3, pet_type=$4,
+       antiparasitic=$5, last_date=$6, frequency=$7, next_date=$8 WHERE id=$9 RETURNING *`,
+      [client_name, phone, pet_name, pet_type, antiparasitic, last_date, Number(frequency), next_date, req.params.id]
+    );
+    if (!rows.length) return res.status(404).json({ error: "Registro no encontrado." });
+    res.json({ ...rows[0], status: calcStatus(rows[0].next_date) });
+  } catch {
+    res.status(500).json({ error: "Error al editar el registro." });
+  }
+});
+
 // DELETE /api/records/:id — eliminar registro
 app.delete("/api/records/:id", async (req, res) => {
   try {

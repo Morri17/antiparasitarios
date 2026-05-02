@@ -11,8 +11,12 @@ const EMPTY = {
   frequency: "30",
 };
 
-export default function RecordForm({ onSubmit, onCancel }) {
-  const [form, setForm] = useState(EMPTY);
+export default function RecordForm({ onSubmit, onCancel, initialValues, submitLabel = "Guardar registro" }) {
+  const [form, setForm] = useState(
+    initialValues
+      ? { ...initialValues, frequency: String(initialValues.frequency) }
+      : EMPTY
+  );
   const [submitting, setSubmitting] = useState(false);
   const [fieldError, setFieldError] = useState("");
 
@@ -22,7 +26,6 @@ export default function RecordForm({ onSubmit, onCancel }) {
     e.preventDefault();
     setFieldError("");
 
-    // Validación básica
     if (!form.client_name.trim() || !form.phone.trim() || !form.pet_name.trim() || !form.antiparasitic.trim()) {
       setFieldError("Completá todos los campos antes de guardar.");
       return;
@@ -31,7 +34,7 @@ export default function RecordForm({ onSubmit, onCancel }) {
     setSubmitting(true);
     try {
       await onSubmit({ ...form, frequency: Number(form.frequency) });
-      setForm(EMPTY);
+      if (!initialValues) setForm(EMPTY);
     } catch (err) {
       setFieldError(err.response?.data?.error || "Error al guardar el registro.");
     } finally {
@@ -114,7 +117,6 @@ export default function RecordForm({ onSubmit, onCancel }) {
         </Field>
       </div>
 
-      {/* Vista previa de próxima fecha */}
       {form.last_date && (
         <p className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-3 py-2">
           📅 Próxima aplicación:{" "}
@@ -130,7 +132,7 @@ export default function RecordForm({ onSubmit, onCancel }) {
           disabled={submitting}
           className="bg-emerald-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-emerald-700 transition disabled:opacity-50"
         >
-          {submitting ? "Guardando..." : "Guardar registro"}
+          {submitting ? "Guardando..." : submitLabel}
         </button>
         <button
           type="button"
