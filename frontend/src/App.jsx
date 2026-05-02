@@ -82,26 +82,29 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-emerald-600 text-white shadow-md">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">🐾</span>
-            <div>
-              <h1 className="text-xl font-bold leading-tight">Antiparasitarios</h1>
-              <p className="text-emerald-100 text-sm">Recordatorios para mascotas</p>
+    <div className="min-h-screen bg-gray-50 w-full overflow-x-hidden">
+      {/* Header */}
+      <header className="bg-emerald-600 text-white shadow-md w-full">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-2xl flex-shrink-0">🐾</span>
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-xl font-bold leading-tight truncate">
+                Antiparasitarios
+              </h1>
+              <p className="text-emerald-100 text-xs hidden sm:block">Recordatorios para mascotas</p>
             </div>
           </div>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="bg-white text-emerald-700 font-semibold px-4 py-2 rounded-lg shadow hover:bg-emerald-50 transition text-sm"
+            className="bg-white text-emerald-700 font-semibold px-3 py-2 rounded-lg shadow hover:bg-emerald-50 transition text-sm flex-shrink-0"
           >
-            {showForm ? "✕ Cancelar" : "+ Nuevo registro"}
+            {showForm ? "✕ Cancelar" : "+ Nuevo"}
           </button>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
+      <main className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 w-full">
         {error && (
           <div className="bg-red-50 border border-red-300 text-red-700 rounded-lg px-4 py-3 text-sm">
             ⚠️ {error}
@@ -109,24 +112,24 @@ export default function App() {
         )}
 
         {showForm && (
-          <div className="bg-white rounded-xl shadow p-6">
-            <h2 className="text-lg font-semibold mb-4 text-gray-700">Nuevo registro</h2>
+          <div className="bg-white rounded-xl shadow p-4 sm:p-6">
+            <h2 className="text-base font-semibold mb-4 text-gray-700">Nuevo registro</h2>
             <RecordForm onSubmit={handleAdd} onCancel={() => setShowForm(false)} />
           </div>
         )}
 
         <Stats counts={statusCounts} active={filterStatus} onFilter={setFilterStatus} />
 
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <input
             type="text"
-            placeholder="Buscar por cliente o mascota..."
+            placeholder="Buscar cliente o mascota..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+            className="flex-1 min-w-0 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
           />
           {search && (
-            <button onClick={() => setSearch("")} className="text-gray-400 hover:text-gray-600 px-2">
+            <button onClick={() => setSearch("")} className="text-gray-400 hover:text-gray-600 px-2 flex-shrink-0">
               ✕
             </button>
           )}
@@ -135,10 +138,10 @@ export default function App() {
         {loading ? (
           <div className="text-center py-12 text-gray-400">Cargando...</div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-12 text-gray-400">
+          <div className="text-center py-10 text-gray-400 text-sm px-4">
             {records.length === 0
-              ? 'No hay registros. Hacé clic en "+ Nuevo registro" para empezar.'
-              : "No hay registros que coincidan con los filtros."}
+              ? 'No hay registros. Tocá "+ Nuevo" para empezar.'
+              : "No hay registros que coincidan."}
           </div>
         ) : (
           <RecordTable

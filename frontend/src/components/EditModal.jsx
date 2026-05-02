@@ -3,11 +3,11 @@ import RecordForm from "./RecordForm";
 export default function EditModal({ record, onSave, onClose }) {
   return (
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl max-w-2xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl max-w-2xl w-full p-5 sm:p-6 space-y-4 max-h-[92vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">

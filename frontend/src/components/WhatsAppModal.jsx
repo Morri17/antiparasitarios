@@ -26,11 +26,11 @@ export default function WhatsAppModal({ record, onClose }) {
   return (
     // Overlay
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 space-y-4"
+        className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl max-w-lg w-full p-5 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
@@ -60,18 +60,18 @@ export default function WhatsAppModal({ record, onClose }) {
         </div>
 
         {/* Botones de acción */}
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <a
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 bg-green-500 hover:bg-green-600 text-white text-center font-medium py-2 px-4 rounded-xl transition text-sm"
+            className="flex-1 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white text-center font-medium py-3 sm:py-2 px-4 rounded-xl transition text-sm"
           >
-            Abrir en WhatsApp Web
+            Abrir en WhatsApp
           </a>
           <button
             onClick={handleCopy}
-            className={`px-4 py-2 rounded-xl border text-sm font-medium transition ${
+            className={`py-3 sm:py-2 px-4 rounded-xl border text-sm font-medium transition ${
               copied
                 ? "bg-emerald-50 border-emerald-300 text-emerald-700"
                 : "border-gray-300 text-gray-600 hover:bg-gray-50"
